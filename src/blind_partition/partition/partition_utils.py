@@ -1,8 +1,22 @@
+import colorsys
 import json
+import random
 
+import geopandas as gpd
 import numpy as np
+import shapely
 from gig import Ent
+from matplotlib import pyplot as plt
+from shapely.ops import unary_union
 from utils import TSVFile
+
+
+def get_random_color():
+    h = random.random()
+    hls = (h, 0.5, 1.0)
+    rgb = colorsys.hls_to_rgb(*hls)
+    hex = '#%02x%02x%02x' % tuple([int(255 * x) for x in rgb])
+    return hex
 
 
 def partition_population(ent_list) -> int:
@@ -74,3 +88,44 @@ def ent_from_d(d):
 def load_ents(tsv_file):
     d_list = TSVFile(tsv_file).read()
     return [ent_from_d(d) for d in d_list]
+
+
+def get_merged_polygon_list(ent_list):
+    all_polygon_list = []
+    for ent in ent_list:
+        polygon_list = list(
+            map(
+                lambda polygon_data: shapely.Polygon(polygon_data).buffer(
+                    0.00001
+                ),
+                ent.get_raw_geo(),
+            )
+        )
+        all_polygon_list += polygon_list
+    shape = unary_union(all_polygon_list)
+
+    polygon_list = (
+        list(shape.geoms)
+        if isinstance(shape, shapely.MultiPolygon)
+        else [shape]
+    )
+    return [list(polygon.exterior.coords) for polygon in polygon_list]
+
+
+def polygon_list_to_geojson(polygon_list) -> gpd.GeoDataFrame:
+    polygon_list_ = [shapely.Polygon(polygon) for polygon in polygon_list]
+    return gpd.GeoDataFrame(
+        geometry=polygon_list_,
+        crs='epsg:4326',
+    )
+
+
+def draw(gdf, ax):
+    gdf.plot(ax=ax, color=get_random_color())
+
+
+def draw_all(gdf_list, png_path):
+    fig, ax = plt.subplots()
+    for gdf in gdf_list:
+        draw(gdf, ax)
+    plt.savefig(png_path)

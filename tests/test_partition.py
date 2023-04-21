@@ -16,7 +16,7 @@ from blind_partition.partition import partition_utils
 ) = (
     'LK-11',
     EntType('dsd'),
-    2,
+    5,
     'dsd2',
 )
 TEST_PARTITION = Partition(
@@ -38,7 +38,11 @@ class TestPartition(TestCase):
 
     def test_ents(self):
         partition = TEST_PARTITION
-        self.assertEqual(len(partition.ents), 2)
+        self.assertEqual(len(partition.ents), TEST_N_PARTITIONS)
+
+    def test_build(self):
+        partition = TEST_PARTITION
+        partition.build()
 
 
 class TestPartitionUtils(TestCase):
@@ -97,3 +101,16 @@ class TestPartitionUtils(TestCase):
         partition_utils.store_ents(ents, tsv_file)
         ents2 = partition_utils.load_ents(tsv_file)
         self.assertEqual(ents, ents2)
+
+    def test_merge_geos_and_draw(self):
+        partition = TEST_PARTITION
+        n = 5
+        ent_list_list = partition_utils.split(
+            partition.sub_region_ent_list, n
+        )
+
+        gdf_list = []
+        for ent_list in ent_list_list:
+            polygon_list = partition_utils.get_merged_polygon_list(ent_list)
+            gdf = partition_utils.polygon_list_to_geojson(polygon_list)
+            gdf_list.append(gdf)
