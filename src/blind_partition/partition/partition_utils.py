@@ -1,3 +1,7 @@
+import numpy as np
+from gig import Ent
+
+
 def partition_population(ent_list) -> int:
     return sum([ent.population for ent in ent_list])
 
@@ -17,3 +21,18 @@ def binary_split(splitable_list: list, n1, n2) -> list[list, list]:
             return sorted_splitable_list[:i], sorted_splitable_list[i:]
 
     raise Exception('Could not split!')
+
+
+def build_ent(ent_list: list) -> Ent:
+    id = '-'.join([ent.id for ent in ent_list])
+    name = '-'.join([ent.name for ent in ent_list])
+    centroid = np.mean([ent.centroid for ent in ent_list], axis=0)
+    population = partition_population(ent_list)
+    return Ent(
+        dict(
+            id=id,
+            name=name,
+            centroid=centroid,
+            population=population,
+        )
+    )

@@ -42,16 +42,19 @@ class TestPartitionUtils(TestCase):
             partition.sub_region_ent_list, 1, 1
         )
 
-        for ent in ent_list1:
-            print(ent.name)
-        print('...')
-        for ent in ent_list2:
-            print(ent.name)
-
         d = math.log(
             partition_utils.partition_population(ent_list1)
             / partition_utils.partition_population(ent_list2),
             2,
         )
-        print(d)
         self.assertLess(abs(d), 0.2)
+
+    def test_build_ent(self):
+        partition = TEST_PARTITION
+        ent_list1, _ = partition_utils.binary_split(
+            partition.sub_region_ent_list, 1, 1
+        )
+        ent1 = partition_utils.build_ent(ent_list1)
+        self.assertEqual(
+            ent1.population, partition_utils.partition_population(ent_list1)
+        )
