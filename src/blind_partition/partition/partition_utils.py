@@ -54,9 +54,13 @@ def split(splitable_list: list, n: int) -> list[list]:
         return split(split_list1, n1) + split(split_list2, n2)
 
 
-def build_ent(ent_list: list) -> Ent:
-    id = '-'.join([ent.id for ent in ent_list])
-    name = '-'.join([ent.name for ent in ent_list])
+def build_ent(id, ent_list: list) -> Ent:
+    sorted_names_and_population = sorted(
+        [(ent.name, ent.population) for ent in ent_list],
+        key=lambda x: x[1],
+        reverse=True,
+    )
+    name = sorted_names_and_population[0][0]
     centroid = list(np.mean([ent.centroid for ent in ent_list], axis=0))
     population = partition_population(ent_list)
     return Ent(

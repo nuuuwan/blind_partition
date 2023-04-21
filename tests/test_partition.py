@@ -17,7 +17,7 @@ from blind_partition.partition import partition_utils
     'LK-11',
     EntType('dsd'),
     5,
-    'dsd2',
+    'x',
 )
 TEST_PARTITION = Partition(
     TEST_REGION_ID,
@@ -89,7 +89,7 @@ class TestPartitionUtils(TestCase):
         ent_list1, _ = partition_utils.binary_split(
             partition.sub_region_ent_list, 2
         )
-        ent1 = partition_utils.build_ent(ent_list1)
+        ent1 = partition_utils.build_ent('ent', ent_list1)
         self.assertEqual(
             ent1.population, partition_utils.partition_population(ent_list1)
         )

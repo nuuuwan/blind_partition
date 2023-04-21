@@ -42,8 +42,10 @@ class Partition:
     @cached_property
     def ents(self) -> list[Ent]:
         ents = [
-            partition_utils.build_ent(ent_list)
-            for ent_list in self.ent_list_list
+            partition_utils.build_ent(
+                f'{self.new_ent_type_name}-{x[0]}', x[1]
+            )
+            for x in enumerate(self.ent_list_list)
         ]
         return ents
 
